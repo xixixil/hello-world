@@ -76,3 +76,163 @@ public class AuthCodeController {
         return new Color(r,g,b);
     }
 }
+
+@Controller
+@RequestMapping("/customer")
+public class CustomerController {
+    @Autowired
+    private ICustomerService customerService;
+
+    @RequestMapping("/register")
+    public String register() {
+        return "customer_register";
+    }
+
+    @RequestMapping("/register_success")
+    public String register_success(Customer customer) {
+        customerService.add(customer);
+        return "customer_register_success";
+    }
+
+
+    @RequestMapping("/toLogin")
+    public String toLogin() {
+        return "customer_login";
+    }
+
+
+    @RequestMapping("/login")
+    public String login(String name, String password, HttpSession session){
+        //根据name和pw查这个用户有没有
+        //登录成功跳转
+        //登录凭证放到session
+        Customer customer=customerService.login(name,password);
+        if(customer!=null&&customer.getRole()==1){
+            session.setAttribute("customer",customer);
+            return "redirect:/customer/tointer"; //登录成功跳转
+        }
+        else {
+            return "redirect:/customer/toLogin"; //登录失败重定向
+        }
+    }
+
+    @RequestMapping("/login1")
+    public String login1(){
+        return "redirect:/customer/tointer";
+    }
+
+    @RequestMapping("/logout")
+    public String logout(HttpSession session){
+        session.invalidate();
+        return "redirect:/customer/toLogin";
+    }
+
+    @RequestMapping("/toUpdate")
+    public String toUpdate(Integer id,Model model){
+        Customer customer = customerService.selectById(id);
+        model.addAttribute("customer",customer);
+        return "customer_update";
+    }
+
+    @RequestMapping("/update")
+    public String update(Customer customer){
+        customerService.update(customer);
+        return "redirect:/customer/selectByPage";
+    }
+
+
+    @RequestMapping("/toUpdatec")
+    public String toUpdatec(Integer id,Model model){
+        Customer customer = customerService.selectById(id);
+        model.addAttribute("customer",customer);
+        return "customer_updatec";
+    }
+
+    @RequestMapping("/updatec")
+    public String updatec(Customer customer){
+        customerService.update(customer);
+        return "redirect:/customer/tointer";
+    }
+
+    @RequestMapping("/search")
+    public String Search(String name, Model model) {
+        if (name != null && name != "") {
+            model.addAttribute("name", name);
+            List<Customer> search = customerService.searchByname(name);
+            model.addAttribute("search", search);
+        }
+        return "customer_search";
+    }
+
+    @RequestMapping("/toAdd")
+    public String toAdd() {
+        return "customer_add";
+    }
+
+    @RequestMapping("/add")
+    public String add(Customer customer) {
+        customerService.add(customer);
+        return "redirect:/customer/selectByPage";
+    }
+
+    //  /customer/deleteById?id=23
+    @RequestMapping("/deleteById")
+    public String deleteById(Integer id){
+        customerService.deleteById(id);
+        //删除完查找最新数据 重定向
+        return "redirect:/customer/selectByPage";
+    }
+
+    @RequestMapping("/deleteAll")
+    public String deleteAll(Integer[] ids) {
+        customerService.deleteAll(ids);
+        return "redirect:/customer/selectByPage";
+    }
+
+    @RequestMapping("/tointer")
+    public String tointer(Model model) {
+        List<Customer> list = customerService.selectAll();
+        model.addAttribute("list", list);
+        //转到commodity_list 界面
+        return "customer_interface";
+    }
+
+    @RequestMapping("/selectByPage")
+    public String selectByPage(@RequestParam(defaultValue = "1") Integer pageNo,
+                               @RequestParam(defaultValue = "10") Integer pageSize, Model model) {
+        System.out.println("CustomerController.selectByPage");
+        PageInfoc pageInfo = customerService.selectByPage(pageNo, pageSize);
+
+        //把pageInfo数据放到内存里面
+        model.addAttribute("pageInfo", pageInfo);
+        //转发到user_list界面展示
+        return "customer_list";
+    }
+
+
+    @RequestMapping("/selectAll")
+    public String selectAll(Model model) {
+        System.out.println("CustomerController.selectAll");
+        // soutm
+        List<Customer> list = customerService.selectAll();
+        model.addAttribute("list", list);
+        //转到customer_list 界面
+        return "customer_list";
+    }
+
+    @RequestMapping("/selectAll1")
+    @ResponseBody
+    public List<Customer> selectAll(){
+        System.out.println("CustomerController.selectAll");
+        // soutm
+        System.out.println("CustomerController.selectAll");
+        List<Customer> list = customerService.selectAll();
+
+        return list;
+    }
+
+    @RequestMapping("/about")
+    public String about(){
+        return "about";
+    }
+}
