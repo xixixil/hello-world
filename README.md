@@ -1,101 +1,85 @@
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Scanner;
 
-// 用户类
-class User {
-    private String username;
-    private String password;
-    private String email;
+// 充电机器人类
+class ChargingRobot {
+    private String type;
+    private String location;
+    private boolean available;
 
-    public User(String username, String password, String email) {
-        this.username = username;
-        this.password = password;
-        this.email = email;
+    public ChargingRobot(String type, String location) {
+        this.type = type;
+        this.location = location;
+        this.available = true;
     }
 
-    public String getUsername() {
-        return username;
+    public String getType() {
+        return type;
     }
 
-    public String getPassword() {
-        return password;
+    public String getLocation() {
+        return location;
     }
 
-    public String getEmail() {
-        return email;
+    public boolean isAvailable() {
+        return available;
+    }
+
+    public void setAvailable(boolean available) {
+        this.available = available;
     }
 }
 
-// 用户管理系统
-class UserManagementSystem {
-    private Map<String, User> users;
+// 预约服务类
+class BookingService {
+    private List<ChargingRobot> chargingRobots;
 
-    public UserManagementSystem() {
-        users = new HashMap<>();
+    public BookingService() {
+        chargingRobots = new ArrayList<>();
     }
 
-    // 注册新用户
-    public void register(String username, String password, String email) {
-        if (!users.containsKey(username)) {
-            User user = new User(username, password, email);
-            users.put(username, user);
-            System.out.println("注册成功！");
-        } else {
-            System.out.println("用户名已存在，请重新选择用户名。");
-        }
+    // 添加充电机器人
+    public void addChargingRobot(ChargingRobot chargingRobot) {
+        chargingRobots.add(chargingRobot);
     }
 
-    // 用户登录
-    public User login(String username, String password) {
-        if (users.containsKey(username)) {
-            User user = users.get(username);
-            if (user.getPassword().equals(password)) {
-                System.out.println("登录成功！");
-                return user;
-            } else {
-                System.out.println("密码错误，请重新输入。");
+    // 预约充电服务
+    public void bookChargingService(String type) {
+        for (ChargingRobot chargingRobot : chargingRobots) {
+            if (chargingRobot.getType().equals(type) && chargingRobot.isAvailable()) {
+                chargingRobot.setAvailable(false);
+                System.out.println("预约成功！您已预约了一台" + type + "充电机器人。");
+                return;
             }
-        } else {
-            System.out.println("用户名不存在，请先注册。");
         }
-        return null;
+        System.out.println("抱歉，暂时没有可用的" + type + "充电机器人，请稍后再试或选择其他类型。");
     }
 }
 
 public class Main {
     public static void main(String[] args) {
-        UserManagementSystem userManagementSystem = new UserManagementSystem();
+        BookingService bookingService = new BookingService();
+        bookingService.addChargingRobot(new ChargingRobot("快充", "A区"));
+        bookingService.addChargingRobot(new ChargingRobot("慢充", "B区"));
+
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
-            System.out.println("欢迎使用新能源汽车移动充电机器人预约系统");
-            System.out.println("1. 注册");
-            System.out.println("2. 登录");
-            System.out.println("3. 退出");
+            System.out.println("欢迎使用充电预约服务");
+            System.out.println("1. 预约充电服务");
+            System.out.println("2. 退出");
 
             int choice = scanner.nextInt();
             scanner.nextLine();  // 消耗换行符
 
             switch (choice) {
                 case 1:
-                    System.out.println("请输入用户名:");
-                    String username = scanner.nextLine();
-                    System.out.println("请输入密码:");
-                    String password = scanner.nextLine();
-                    System.out.println("请输入邮箱:");
-                    String email = scanner.nextLine();
-                    userManagementSystem.register(username, password, email);
+                    System.out.println("请选择充电机器人类型（快充/慢充）:");
+                    String type = scanner.nextLine();
+                    bookingService.bookChargingService(type);
                     break;
                 case 2:
-                    System.out.println("请输入用户名:");
-                    String loginUsername = scanner.nextLine();
-                    System.out.println("请输入密码:");
-                    String loginPassword = scanner.nextLine();
-                    User loggedInUser = userManagementSystem.login(loginUsername, loginPassword);
-                    // 在这里可以添加其他功能，比如预约充电服务等
-                    break;
-                case 3:
                     System.out.println("退出系统。");
                     System.exit(0);
                     break;
