@@ -1,3 +1,103 @@
+
+import java.util.*;
+
+// 用户类
+class User {
+    private String username;
+    private String password;
+    
+    public User(String username, String password) {
+        this.username = username;
+        this.password = password;
+    }
+    
+    // Getter 方法
+    public String getUsername() {
+        return username;
+    }
+}
+
+// 充电机器人类
+class ChargingRobot {
+    private int id;
+    private boolean available;
+    
+    public ChargingRobot(int id) {
+        this.id = id;
+        this.available = true;
+    }
+    
+    // Getter 和 Setter 方法
+    public int getId() {
+        return id;
+    }
+    
+    public boolean isAvailable() {
+        return available;
+    }
+    
+    public void setAvailable(boolean available) {
+        this.available = available;
+    }
+}
+
+// 充电服务类
+class ChargingService {
+    private ChargingRobot robot;
+    private User user;
+    private Date appointmentTime;
+    
+    public ChargingService(ChargingRobot robot, User user, Date appointmentTime) {
+        this.robot = robot;
+        this.user = user;
+        this.appointmentTime = appointmentTime;
+    }
+    
+    // Getter 方法
+    public ChargingRobot getRobot() {
+        return robot;
+    }
+}
+
+// 系统管理类
+class SystemManager {
+    private List<User> users;
+    private List<ChargingRobot> robots;
+    private List<ChargingService> services;
+    
+    public SystemManager() {
+        this.users = new ArrayList<>();
+        this.robots = new ArrayList<>();
+        this.services = new ArrayList<>();
+    }
+    
+    // 添加用户
+    public void addUser(User user) {
+        users.add(user);
+    }
+    
+    // 添加充电机器人
+    public void addRobot(ChargingRobot robot) {
+        robots.add(robot);
+    }
+    
+    // 预约充电服务
+    public void bookChargingService(User user, ChargingRobot robot, Date appointmentTime) {
+        ChargingService service = new ChargingService(robot, user, appointmentTime);
+        services.add(service);
+        robot.setAvailable(false);
+        System.out.println("用户 " + user.getUsername() + " 预约了充电服务，机器人编号：" + robot.getId());
+    }
+    
+    // 查找可用机器人
+    public ChargingRobot findAvailableRobot() {
+        for (ChargingRobot robot : robots) {
+            if (robot.isAvailable()) {
+                return robot;
+            }
+        }
+        return null;
+=======
 import com.situ.springboot.pojo.User;
 import com.situ.springboot.service.IUserService;
 import com.situ.springboot.util.PageInfo;
@@ -73,13 +173,4 @@ public class UserController {
             return "error";
         }
         return "user/user-search";
-    }
-
-    @RequestMapping("/logout")
-    public String logout(HttpSession session) {
-        session.invalidate();
-        return "redirect:/user/toLogin";
-    }
-
-    // 其他方法不变...
 }
